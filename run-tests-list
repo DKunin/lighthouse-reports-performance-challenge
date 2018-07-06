@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cat ./list | while read i; do run-test $i; done

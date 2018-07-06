@@ -1,0 +1,11 @@
+#!/bin/bash
+
+ls ./ | grep .json | while read i; do \
+getprop $i requestedUrl &&\
+getprop $i audits.first-meaningful-paint.rawValue &&\
+getprop $i audits.time-to-first-byte.rawValue &&\
+getprop $i audits.interactive.rawValue &&\
+getprop $i audits.bootup-time.rawValue &&\
+getprop $i audits.total-byte-weight.rawValue &&\
+getprop $i audits.unused-css-rules.rawValue &&\
+getprop $i audits.dom-size.rawValue ; done
