@@ -1,3 +1,11 @@
 #!/bin/bash
 
-lighthouse --config-path=./custom-config.js $1 --preset="perf" --quiet --chrome-flags="--headless"  --disable-device-emulation --output json --output-path=./lighthouse-results-$(date +%s).json
+lighthouse \
+--config-path=./custom-config.js $1 \
+--preset="perf" \
+--quiet \
+--chrome-flags="--headless"  \
+--disable-device-emulation \
+--throttling-method=provided \
+--output json \
+--output-path=./reports/lighthouse-results-$(date +%s).json

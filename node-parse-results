@@ -1,0 +1,79 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const util = require('util');
+
+const readDir = util.promisify(fs.readdir);
+const readFile = util.promisify(fs.readFile);
+
+function determineTeam(string) {
+    if (string.includes('avpm')) {
+        return 'avpm';
+    }
+    if (string.includes('master')) {
+        return 'master';
+    }
+    if (string.includes('dp-')) {
+        return 'dp';
+    }
+    return null;
+}
+
+function determinePage(string) {
+    if (
+        string.includes(
+            'odezhda_obuv_aksessuary/svadebnoe_plate_'
+        )
+    ) {
+        return 'item';
+    }
+    if (string.includes('rossiya/lichnye_veschi')) {
+        return 'category';
+    }
+    if (string.includes('rossiya')) {
+        return 'main';
+    }
+    return null;
+}
+
+const auditsMap = require('./custom-config').settings.onlyAudits;
+
+function returnStatsEtalon() {
+    return auditsMap.reduce(function(newObject, singleKey) {
+        newObject[singleKey] = [];
+        return newObject;
+    }, {});
+}
+
+readDir('./reports').then(result => {
+    const allTheFiles = result.map(singleFilename => {
+        return readFile(
+            `./reports/${singleFilename}`
+        ).then(singleFileContents => JSON.parse(singleFileContents.toString()));
+    });
+    Promise.all(allTheFiles).then(allTheFilesContents => {
+        const accumulate = allTheFilesContents.reduce(
+            (newObject, singleItem) => {
+                const curTeam = determineTeam(singleItem.finalUrl);
+                const curPage = determinePage(singleItem.finalUrl);
+                if (!newObject[curTeam]) {
+                    newObject[curTeam] = {
+                        main: returnStatsEtalon(),
+                        category: returnStatsEtalon(),
+                        item: returnStatsEtalon()
+                    };
+                }
+                auditsMap.forEach(singleAuditKey => {
+                    newObject[curTeam][curPage][singleAuditKey] = newObject[
+                        curTeam
+                    ][curPage][singleAuditKey].concat(
+                        singleItem.audits[singleAuditKey].rawValue
+                    );
+                });
+                return newObject;
+            },
+            {}
+        );
+        console.log(JSON.stringify(accumulate, null, 4));
+    });
+});
