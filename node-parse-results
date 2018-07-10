@@ -22,7 +22,7 @@ function determineTeam(string) {
 function determinePage(string) {
     if (
         string.includes(
-            'odezhda_obuv_aksessuary/svadebnoe_plate_'
+            'kaliningrad/odezhda_obuv_aksessuary/kedy_converse_zhenskie_1336916581?slocation=621540'
         )
     ) {
         return 'item';
@@ -67,7 +67,7 @@ readDir('./reports').then(result => {
                     newObject[curTeam][curPage][singleAuditKey] = newObject[
                         curTeam
                     ][curPage][singleAuditKey].concat(
-                        singleItem.audits[singleAuditKey].rawValue
+                        singleItem.audits ? singleItem.audits[singleAuditKey].rawValue : null
                     );
                 });
                 return newObject;
